@@ -101,7 +101,6 @@ const allDirectoryPaths = (val, currentPath = []) => {
 }
 
 
-
 const parseDirectoryTree = R.pipe(
   R.reduce(
     ([path, dirs], command) => {
@@ -113,18 +112,29 @@ const parseDirectoryTree = R.pipe(
   R.nth(1)
 )
 
-const asdf = (file) => {
+const part1 = (file) => {
     const parsedFile = parseFile(file)
     const dirs = parseDirectoryTree(parsedFile)
     const paths = R.uniq(allDirectoryPaths(dirs))
     const dirSizes = paths.map(directorySizeFromPath(dirs))
     const lt100000 = dirSizes.filter(n => n <= 100000)
-    fs.writeFileSync('dirs.json', JSON.stringify(dirs))
-    fs.writeFileSync('paths.json', JSON.stringify(paths))
-    fs.writeFileSync('dirSizes.json', JSON.stringify(dirSizes))
-    fs.writeFileSync('lt100.json', JSON.stringify(lt100000))
     return R.sum(lt100000)
 }
 
+const TOTAL_AVAILABLE = 70000000
+const NEEDED_AMOUNT = 30000000
 
-console.log(asdf(FILE))
+const part2 = (file) => {
+    const parsedFile = parseFile(file)
+    const dirs = parseDirectoryTree(parsedFile)
+    const used = directorySizeFromPath(dirs)([])
+    const paths = R.uniq(allDirectoryPaths(dirs))
+    const dirSizes = paths.map(directorySizeFromPath(dirs))
+    const requiredSpace = used + NEEDED_AMOUNT - TOTAL_AVAILABLE
+    const gtRequired = dirSizes.filter(s => s >= requiredSpace)
+    gtRequired.sort((a, b) => a - b)
+    return R.head(gtRequired)
+}
+
+
+console.log(part1(FILE), part2(FILE))
