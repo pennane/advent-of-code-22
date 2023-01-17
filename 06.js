@@ -6,7 +6,8 @@ const readFile = (n) => fs.readFileSync(n, 'utf8')
 
 const FILE = readFile(FILE_NAME)
 
-const MARKER_LENGTH = 4
+const END_MARKER_LENGTH = 4
+const START_MARKER_LENGTH = 14
 
 const pipe = fs => v => fs.reduce((v, f) => f(v), v)
 const converge = cf => bfs => v => cf(...bfs.map(f => f(v)))
@@ -33,11 +34,17 @@ const windowsIndexed = size => function* (arr) {
     }
 }
 
-const markerEndIndex = pipe([
-    windowsIndexed(MARKER_LENGTH),
+const startMarkerEndIndex = pipe([
+    windowsIndexed(START_MARKER_LENGTH),
     find(([window, i]) => allUniq(Array.from(window))),
-    ([window, i]) => i + MARKER_LENGTH
+    ([window, i]) => i + START_MARKER_LENGTH
+])
+
+const endMarkerEndIndex = pipe([
+    windowsIndexed(END_MARKER_LENGTH),
+    find(([window, i]) => allUniq(Array.from(window))),
+    ([window, i]) => i + END_MARKER_LENGTH
 ]) 
 
-console.log(markerEndIndex(FILE))
+console.log(endMarkerEndIndex(FILE), startMarkerEndIndex(FILE))
 
