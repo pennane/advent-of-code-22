@@ -7,15 +7,33 @@ const readFile = n => fs.readFileSync(n, 'utf8')
 
 const FILE = readFile(FILE_NAME)
 
-const chunkSums = R.pipe(
+const parseFile = R.pipe(
     R.split('\n\n'),
-    R.map(R.pipe(
-      R.split('\n'),
-      R.map(parseFloat),
-      R.sum
-    )),
+    R.map(
+        R.pipe(
+            R.split('\n'),
+            R.map(parseFloat)
+        )
+    )
 )
 
-const largestChunkSum = R.pipe(chunkSums,R.reduce(R.max,0))
-const largest3ChunkSums = R.pipe(chunkSums,R.sort(( a, b ) => b - a), R.take(3))
-console.log(R.sum(largest3ChunkSums(FILE)))
+const chunkSums = R.map(R.sum)
+const arrMax = R.reduce(R.max, 0)
+
+const largestChunkSum = R.pipe(
+    parseFile,
+    chunkSums,
+    arrMax
+)
+
+const sortDec = R.sort(( a, b ) => b - a)
+
+const sumOfLargest3chunks = R.pipe(
+    parseFile,
+    chunkSums,
+    sortDec,
+    R.take(3),
+    R.sum
+)
+
+console.log(largestChunkSum(FILE), sumOfLargest3chunks(FILE))
